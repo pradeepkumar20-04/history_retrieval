@@ -3,8 +3,17 @@ import os
 import sqlite3
 import csv
 import io
+import time
+import shutil
+import tempfile
 
 app = Flask(__name__)
+
+def copy_database_to_temp(path):
+    temp_dir = tempfile.gettempdir()
+    temp_path = os.path.join(temp_dir, os.path.basename(path))
+    shutil.copy2(path, temp_path)
+    return temp_path
 
 def get_history(browser):
     history = []
@@ -16,17 +25,36 @@ def get_history(browser):
         path = os.path.expanduser('~') + r'\AppData\Local\Microsoft\Edge\User Data\Default\History'
     elif browser == 'tor':
         path = r'C:\Users\prath\Desktop\Tor Browser\Browser\TorBrowser\Data\Browser\profile.default\places.sqlite'
+    elif browser == 'opera':
+        path = os.path.expanduser('~') + r'\AppData\Roaming\Opera Software\Opera Stable\Default\History'
+    elif browser == 'brave':
+        path = os.path.expanduser('~') + r'\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\History'
     
     if path and os.path.exists(path):
-        conn = sqlite3.connect(path)
-        cursor = conn.cursor()
-        if browser == 'tor':
-            cursor.execute("SELECT url, title, visit_count, datetime(last_visit_date/1000000, 'unixepoch', 'localtime') as last_visit FROM moz_places")
-        else:
-            cursor.execute("SELECT url, title, visit_count, datetime(last_visit_time/1000000-11644473600, 'unixepoch', 'localtime') as last_visit FROM urls")
-        
-        history = cursor.fetchall()
-        conn.close()
+        retries = 5
+        while retries > 0:
+            try:
+                # Copy the database file to a temporary location
+                temp_path = copy_database_to_temp(path)
+
+                conn = sqlite3.connect(f'file:{temp_path}?mode=ro', uri=True)
+                cursor = conn.cursor()
+                if browser == 'tor':
+                    cursor.execute("SELECT url, title, visit_count, datetime(last_visit_date/1000000, 'unixepoch', 'localtime') as last_visit FROM moz_places")
+                else:
+                    cursor.execute("SELECT url, title, visit_count, datetime(last_visit_time/1000000-11644473600, 'unixepoch', 'localtime') as last_visit FROM urls")
+                history = cursor.fetchall()
+                conn.close()
+                os.remove(temp_path)  # Remove the temporary file after use
+                break
+            except sqlite3.OperationalError as e:
+                if "database is locked" in str(e):
+                    retries -= 1
+                    time.sleep(1)
+                else:
+                    raise
+        if retries == 0:
+            raise sqlite3.OperationalError("Database is locked after multiple attempts")
     
     return history
 
@@ -40,11 +68,15 @@ def view_history():
     chrome_history = get_history('chrome') if browser == 'chrome' else []
     edge_history = get_history('edge') if browser == 'edge' else []
     tor_history = get_history('tor') if browser == 'tor' else []
+    opera_history = get_history('opera') if browser == 'opera' else []
+    brave_history = get_history('brave') if browser == 'brave' else []
 
     return render_template('view_history.html', 
                            chrome_history=chrome_history, 
                            edge_history=edge_history, 
-                           tor_history=tor_history)
+                           tor_history=tor_history,
+                           opera_history=opera_history,
+                           brave_history=brave_history)
 
 @app.route('/download_history', methods=['POST'])
 def download_history():

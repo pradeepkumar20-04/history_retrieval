@@ -146,6 +146,8 @@
             <div class="tab active" data-tab="chrome">Chrome</div>
             <div class="tab" data-tab="edge">Edge</div>
             <div class="tab" data-tab="tor">Tor</div>
+            <div class="tab" data-tab="opera">Opera</div>
+            <div class="tab" data-tab="brave">Brave</div>
         </div>
 
         <div id="chrome" class="tab-content active">
@@ -247,6 +249,74 @@
             <form action="/download_history" method="post">
                 <input type="hidden" name="browser" value="tor">
                 <button class="download-btn" type="submit">Download Tor History CSV</button>
+            </form>
+        </div>
+
+        <div id="opera" class="tab-content">
+            <h2>Opera History</h2>
+            <table id="opera-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if opera_history %}
+                        {% for url, title, visit_count, last_visit in opera_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Opera history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="opera">
+                <button class="download-btn" type="submit">Download Opera History CSV</button>
+            </form>
+        </div>
+
+        <div id="brave" class="tab-content">
+            <h2>Brave History</h2>
+            <table id="brave-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if brave_history %}
+                        {% for url, title, visit_count, last_visit in brave_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Brave history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="brave">
+                <button class="download-btn" type="submit">Download Brave History CSV</button>
             </form>
         </div>
     </div>

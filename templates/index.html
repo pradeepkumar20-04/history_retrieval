@@ -64,6 +64,12 @@
         .tor-bg {
             background-image: url('{{ url_for('static', filename='tor.jpg') }}');
         }
+        .opera-bg {
+            background-image: url('{{ url_for('static', filename='opera.jpg') }}');
+        }
+        .brave-bg {
+            background-image: url('{{ url_for('static', filename='brave.jpg') }}');
+        }
         .error {
             color: red;
             font-weight: bold;
@@ -74,7 +80,7 @@
         function changeBackground() {
             var selectedBrowser = document.querySelector('input[name="browser"]:checked').value;
 
-            document.body.classList.remove('chrome-bg', 'edge-bg', 'tor-bg');
+            document.body.classList.remove('chrome-bg', 'edge-bg', 'tor-bg', 'opera-bg', 'brave-bg');
 
             if (selectedBrowser === 'chrome') {
                 document.body.classList.add('chrome-bg');
@@ -82,6 +88,10 @@
                 document.body.classList.add('edge-bg');
             } else if (selectedBrowser === 'tor') {
                 document.body.classList.add('tor-bg');
+            } else if (selectedBrowser === 'opera') {
+                document.body.classList.add('opera-bg');
+            } else if (selectedBrowser === 'brave') {
+                document.body.classList.add('brave-bg');
             }
         }
     </script>
@@ -100,6 +110,14 @@
         <label>
             <input type="radio" name="browser" value="tor" onclick="changeBackground()"> 
             <i class="fas fa-user-secret"></i> Tor
+        </label>
+        <label>
+            <input type="radio" name="browser" value="opera" onclick="changeBackground()"> 
+            <i class="fab fa-opera"></i> Opera
+        </label>
+        <label>
+            <input type="radio" name="browser" value="brave" onclick="changeBackground()"> 
+            <i class="fab fa-brave"></i> Brave
         </label>
 
         <button type="submit">View History</button>
