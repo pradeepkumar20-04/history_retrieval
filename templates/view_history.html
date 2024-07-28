@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browsing History Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007BFF;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            border-bottom: 2px solid #007BFF;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: -1px;
+            font-weight: bold;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .tab:hover {
+            background: #e1e1e1;
+        }
+        .tab.active {
+            background: #fff;
+            border-color: #ddd #ddd #fff #ddd;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e1e1e1;
+        }
+        /* Column width styles */
+        th, td {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .url-cell {
+            width: 30%;
+        }
+        .title-cell {
+            width: 20%;
+        }
+        .visit-count-cell {
+            width: 10%;
+        }
+        .last-visit-cell {
+            width: 20%;
+        }
+        .empty-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 30px;
+        }
+        .download-btn {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .download-btn:hover {
+            background: #0056b3;
+        }
+        @media (max-width: 768px) {
+            .url-cell, .title-cell, .visit-count-cell, .last-visit-cell {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            th, td {
+                display: block;
+                text-align: right;
+            }
+            td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Browsing History Viewer</h1>
+        <div class="tabs">
+            <div class="tab active" data-tab="chrome">Chrome</div>
+            <div class="tab" data-tab="edge">Edge</div>
+            <div class="tab" data-tab="tor">Tor</div>
+        </div>
+
+        <div id="chrome" class="tab-content active">
+            <h2>Chrome History</h2>
+            <table id="chrome-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if chrome_history %}
+                        {% for url, title, visit_count, last_visit in chrome_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Chrome history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="chrome">
+                <button class="download-btn" type="submit">Download Chrome History CSV</button>
+            </form>
+        </div>
+
+        <div id="edge" class="tab-content">
+            <h2>Edge History</h2>
+            <table id="edge-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if edge_history %}
+                        {% for url, title, visit_count, last_visit in edge_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Edge history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="edge">
+                <button class="download-btn" type="submit">Download Edge History CSV</button>
+            </form>
+        </div>
+
+        <div id="tor" class="tab-content">
+            <h2>Tor History</h2>
+            <table id="tor-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if tor_history %}
+                        {% for url, title, visit_count, last_visit in tor_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Tor history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="tor">
+                <button class="download-btn" type="submit">Download Tor History CSV</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
