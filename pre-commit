@@ -1,5 +1,0 @@
-#!/bin/sh
-echo "Running pre-commit hook"
-cd C:/Users/pradeep/Downloads/chrome_history_retrival/chrome_history_retrival || exit 1
-git add .
-echo "pre-commit hook completed"
