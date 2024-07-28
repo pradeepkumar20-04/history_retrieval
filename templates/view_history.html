@@ -148,6 +148,7 @@
             <div class="tab" data-tab="tor">Tor</div>
             <div class="tab" data-tab="opera">Opera</div>
             <div class="tab" data-tab="brave">Brave</div>
+            <div class="tab" data-tab="firefox">Firefox</div>
         </div>
 
         <div id="chrome" class="tab-content active">
@@ -317,6 +318,40 @@
             <form action="/download_history" method="post">
                 <input type="hidden" name="browser" value="brave">
                 <button class="download-btn" type="submit">Download Brave History CSV</button>
+            </form>
+        </div>
+
+        <div id="firefox" class="tab-content">
+            <h2>Firefox History</h2>
+            <table id="firefox-table">
+                <thead>
+                    <tr>
+                        <th class="url-cell">URL</th>
+                        <th class="title-cell">Title</th>
+                        <th class="visit-count-cell">Visit Count</th>
+                        <th class="last-visit-cell">Last Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if firefox_history %}
+                        {% for url, title, visit_count, last_visit in firefox_history %}
+                            <tr>
+                                <td class="url-cell" data-label="URL">{{ url }}</td>
+                                <td class="title-cell" data-label="Title">{{ title }}</td>
+                                <td class="visit-count-cell" data-label="Visit Count">{{ visit_count }}</td>
+                                <td class="last-visit-cell" data-label="Last Visit Time">{{ last_visit }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="empty-message">No Firefox history available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <form action="/download_history" method="post">
+                <input type="hidden" name="browser" value="firefox">
+                <button class="download-btn" type="submit">Download Firefox History CSV</button>
             </form>
         </div>
     </div>

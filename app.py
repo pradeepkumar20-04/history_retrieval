@@ -29,7 +29,9 @@ def get_history(browser):
         path = os.path.expanduser('~') + r'\AppData\Roaming\Opera Software\Opera Stable\Default\History'
     elif browser == 'brave':
         path = os.path.expanduser('~') + r'\AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\History'
-    
+    elif browser == 'firefox':
+        path = os.path.expanduser('~') + r'\AppData\Roaming\Mozilla\Firefox\Profiles\<your-profile-folder>\places.sqlite'  # Update with the actual profile folder
+
     if path and os.path.exists(path):
         retries = 5
         while retries > 0:
@@ -39,7 +41,7 @@ def get_history(browser):
 
                 conn = sqlite3.connect(f'file:{temp_path}?mode=ro', uri=True)
                 cursor = conn.cursor()
-                if browser == 'tor':
+                if browser == 'tor' or browser == 'firefox':
                     cursor.execute("SELECT url, title, visit_count, datetime(last_visit_date/1000000, 'unixepoch', 'localtime') as last_visit FROM moz_places")
                 else:
                     cursor.execute("SELECT url, title, visit_count, datetime(last_visit_time/1000000-11644473600, 'unixepoch', 'localtime') as last_visit FROM urls")
@@ -70,13 +72,15 @@ def view_history():
     tor_history = get_history('tor') if browser == 'tor' else []
     opera_history = get_history('opera') if browser == 'opera' else []
     brave_history = get_history('brave') if browser == 'brave' else []
+    firefox_history = get_history('firefox') if browser == 'firefox' else []
 
     return render_template('view_history.html', 
                            chrome_history=chrome_history, 
                            edge_history=edge_history, 
                            tor_history=tor_history,
                            opera_history=opera_history,
-                           brave_history=brave_history)
+                           brave_history=brave_history,
+                           firefox_history=firefox_history)
 
 @app.route('/download_history', methods=['POST'])
 def download_history():

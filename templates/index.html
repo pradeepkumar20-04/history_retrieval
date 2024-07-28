@@ -70,6 +70,9 @@
         .brave-bg {
             background-image: url('{{ url_for('static', filename='brave.jpg') }}');
         }
+        .firefox-bg {
+            background-image: url('{{ url_for('static', filename='firefox.jpg') }}');
+        }
         .error {
             color: red;
             font-weight: bold;
@@ -80,7 +83,7 @@
         function changeBackground() {
             var selectedBrowser = document.querySelector('input[name="browser"]:checked').value;
 
-            document.body.classList.remove('chrome-bg', 'edge-bg', 'tor-bg', 'opera-bg', 'brave-bg');
+            document.body.classList.remove('chrome-bg', 'edge-bg', 'tor-bg', 'opera-bg', 'brave-bg', 'firefox-bg');
 
             if (selectedBrowser === 'chrome') {
                 document.body.classList.add('chrome-bg');
@@ -92,6 +95,8 @@
                 document.body.classList.add('opera-bg');
             } else if (selectedBrowser === 'brave') {
                 document.body.classList.add('brave-bg');
+            } else if (selectedBrowser === 'firefox') {
+                document.body.classList.add('firefox-bg');
             }
         }
     </script>
@@ -118,6 +123,10 @@
         <label>
             <input type="radio" name="browser" value="brave" onclick="changeBackground()"> 
             <i class="fab fa-brave"></i> Brave
+        </label>
+        <label>
+            <input type="radio" name="browser" value="firefox" onclick="changeBackground()"> 
+            <i class="fab fa-firefox"></i> Firefox
         </label>
 
         <button type="submit">View History</button>
